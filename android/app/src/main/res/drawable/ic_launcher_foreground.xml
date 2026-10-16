@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Стилизованная буква M и страница книги — знак приложения MindLex. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#7C5CFF"
+        android:pathData="M34,72 L34,36 L42,36 L54,54 L66,36 L74,36 L74,72 L66,72 L66,50 L54,66 L42,50 L42,72 Z" />
+    <path
+        android:fillColor="#4ED8C0"
+        android:pathData="M30,78 L78,78 L78,82 L30,82 Z" />
+</vector>
