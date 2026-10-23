@@ -1,0 +1,43 @@
+# MindLex: приложение и база данных.
+# Фактор X (Dev/prod parity): локально и в продакшене используется один и тот же PostgreSQL,
+# схема создаётся одинаковыми миграциями Flyway.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: mindlex-db
+    environment:
+      POSTGRES_DB: ${MINDLEX_DB_NAME:-mindlex}
+      POSTGRES_USER: ${MINDLEX_DB_USER:-mindlex}
+      POSTGRES_PASSWORD: ${MINDLEX_DB_PASSWORD:-mindlex}
+    ports:
+      - "${MINDLEX_DB_PORT:-5432}:5432"
+    volumes:
+      - mindlex-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MINDLEX_DB_USER:-mindlex} -d ${MINDLEX_DB_NAME:-mindlex}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: ./backend
+    container_name: mindlex-api
+    environment:
+      MINDLEX_DB_URL: jdbc:postgresql://db:5432/${MINDLEX_DB_NAME:-mindlex}
+      MINDLEX_DB_USER: ${MINDLEX_DB_USER:-mindlex}
+      MINDLEX_DB_PASSWORD: ${MINDLEX_DB_PASSWORD:-mindlex}
+      MINDLEX_JWT_SECRET: ${MINDLEX_JWT_SECRET:-change-me-please-32-bytes-minimum-secret}
+      MINDLEX_CORS_ORIGINS: ${MINDLEX_CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      MINDLEX_LOG_LEVEL: ${MINDLEX_LOG_LEVEL:-INFO}
+      MINDLEX_DEMO_USER_ENABLED: ${MINDLEX_DEMO_USER_ENABLED:-true}
+      PORT: 8080
+    ports:
+      - "${PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mindlex-db-data:
